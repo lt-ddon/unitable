@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+	<head>
+		<meta charset="UTF-8">
+		<style>
+			#d_main
+			{
+				width: 100%;
+			}
+			table
+			{
+				width: 100%;
+				border: 5px outset;
+			}
+			th
+			{
+				width: 6%;
+				border: 2px groove;
+				
+			}
+			#th_col
+			{
+				width: 4%;
+				border: 2px groove;
+				text-align: left;
+			}
+			td
+			{
+				width: 6%;
+				border: 2px inset;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+			<h1>Wielka tablica znaków UNICODE<h1>
+			<h2>Legenda:</h2>
+			<ul>
+				<li>B (Block): Blok zawierający 256 znaków.</li>
+				<li>O (Offset): Najmłodsza cyfra kodu znaku.</li>
+				<li>L (Line): Starsze cyfry kodu znaku.</li>
+			</ul>
+			<button onclick="genPlane(0)">Generuj plan 0</button>
+			<button onclick="genPlane(1)">Generuj plan 1</button>
+			<button onclick="genPlane(2)">Generuj plan 2</button>
+			<button onclick="genPlane(3)">Generuj plan 3</button>
+			<button onclick="genPlane(14)">Generuj plan 14</button>
+		<div id="d_main"><h3>Uwaga! Generowanie może potrwać kilka minut. W tym czasie karta przeglądarki może nie odpowiadać.</h3></div>
+		<script>
+		function genPlane(plane)
+		{
+			document.getElementById("d_main").innerHTML = "<h3>Plan " + plane + ":</h3><img src=\"plane" + plane + ".svg\" alt=\"Plan bloków\"><br>";
+			for (let i = 0; i < 256; i++)
+			{
+				var cont = "<table>";
+				let b = plane * 256 + i;
+				cont += "<tr>";
+				cont += "<th id=\"th_col\">B:" + b.toString(16).toUpperCase() + "</th>";
+				for (let j = 0; j < 16; j++) cont += "<th>O: x" + j.toString(16).toUpperCase() + "</th>";
+				cont += "</tr>";
+				for (let j = 0; j < 16; j++)
+				{
+					let l = (plane * 4096) + (i * 16) + j;
+					cont += "<tr>";
+					cont += "<th id=\"th_col\">L:" + l.toString(16).toUpperCase() + "x</th>";
+					for (let k = 0; k < 16; k++) cont += "<td>" + getUnicodeCharacter((plane * 65536) + (i * 256) + (j * 16) + k) + "</td>";
+					cont += "</tr>";
+				}
+				cont += "</table>";
+				document.getElementById("d_main").innerHTML += cont;
+			}
+		}
+		function getUnicodeCharacter(cp)
+		{
+			if (cp >= 0 && cp <= 0xD7FF || cp >= 0xE000 && cp <= 0xFFFF) return String.fromCharCode(cp);
+			cp -= 0x10000;
+			let first = ((0xffc00 & cp) >> 10) + 0xD800;
+			let second = (0x3ff & cp) + 0xDC00;
+			return String.fromCharCode(first) + String.fromCharCode(second);
+		}
+		</script>
+	</body>
+</html>

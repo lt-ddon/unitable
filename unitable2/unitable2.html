@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pl">
+	<head>
+		<meta charset="UTF-8">
+		<style>
+			body
+			{
+				background-color: #cf9;
+			}
+			h1
+			{
+				margin: 0;
+			}
+			img
+			{
+				border: 5px outset;
+			}
+			#d_io
+			{
+				display: flex;
+				align-items: stretch;
+			}
+			#d_main
+			{
+				width: 100%;
+			}
+			#d_graph
+			{
+				flex: 1;
+			}
+			#d_cont
+			{
+				flex: 1;
+				align-self: flex-end;
+				margin: 2px;
+				text-align: right;
+			}
+			table
+			{
+				background-color: #fff;
+				width: 100%;
+				border: 5px outset;
+			}
+			th
+			{
+				width: 6%;
+				border: 2px groove;
+				
+			}
+			#th_col
+			{
+				width: 4%;
+				border: 2px groove;
+				text-align: left;
+			}
+			td
+			{
+				width: 6%;
+				height: 30px;
+				border: 2px inset;
+				text-align: center;
+			}
+			#td_ch
+			{
+				width: 6%;
+				height: 30px;
+				border: 5px solid red;
+				text-align: center;
+			}
+			input
+			{
+				width: 50px;
+				font-size: 16px;
+			}
+			button
+			{
+				height: 30px;
+				font-size: 16px;
+			}
+		</style>
+		<title>UNITABLE</title>
+	</head>
+	<body onload="genBlock()">
+		<h1>Wielka tablica znaków UNICODE<h1>
+		<h2>Legenda:</h2>
+		<ul>
+			<li>B (Block): Blok zawierający 256 znaków.</li>
+			<li>O (Offset): Najmłodsza cyfra kodu znaku.</li>
+			<li>L (Line): Starsze cyfry kodu znaku.</li>
+		</ul>
+		<div id="d_io">
+			<div id="d_graph"></div>
+			<div id="d_cont">
+				<button onclick="prevBlock()">Poprzedni blok</button>
+				<button onclick="nextBlock()">Następny blok</button>
+				&emsp;
+				<input maxlength="6" id="i_code">
+				<button onclick="findCode()">Znajdź kod</button>
+				&emsp;
+				<input maxlength="1" id="i_char">
+				<button onclick="findChar()">Znajdź znak</button>
+			</div>
+		</div>
+		<div id="d_main"></div>
+		<script>
+		var ut_block = 0;
+		function nextBlock()
+		{
+			ut_block++;
+			if (ut_block > 4351) ut_block = 0;
+			genBlock();
+		}
+		function prevBlock()
+		{
+			ut_block--;
+			if (ut_block < 0) ut_block = 0;
+			genBlock();
+		}
+		function findCode()
+		{
+			let c = document.getElementById('i_code').value;
+			let c16 = parseInt(c, 16);
+			ut_block = c16 >> 8;
+			genBlock(c16);
+		}
+		function findChar()
+		{
+			let c = document.getElementById('i_char').value;
+			let c16 = c.codePointAt(0);
+			ut_block = c16 >> 8;
+			genBlock(c16);
+		}
+		function genBlock(choosen = -1)
+		{
+			let plane = ut_block >> 8;
+			document.getElementById("d_graph").innerHTML = "<h3>Plan " + plane + ":</h3><img src=\"plane" + plane + ".svg\" alt=\"Plan bloków\">";
+			var cont = "<table><tr><th id=\"th_col\">B:" + ut_block.toString(16).toUpperCase() + "</th>";
+			for (let j = 0; j < 16; j++) cont += "<th>O: x" + j.toString(16).toUpperCase() + "</th>";
+			cont += "</tr>";
+			for (let j = 0; j < 16; j++)
+			{
+				let l = (ut_block * 16) + j;
+				cont += "<tr>";
+				cont += "<th id=\"th_col\">L:" + l.toString(16).toUpperCase() + "x</th>";
+				for (let k = 0; k < 16; k++)
+				{
+					if ((l * 16 + k) == choosen) cont += "<td id=\"td_ch\">";
+					else cont += "<td>";
+					cont += String.fromCodePoint(l * 16 + k) + "</td>"
+				}
+				cont += "</tr>";
+			}
+			cont += "</table>";
+			document.getElementById("d_main").innerHTML = cont;
+		}
+		</script>
+	</body>
+</html>
